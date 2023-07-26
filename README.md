@@ -20,7 +20,7 @@ source  {project_path}/.venvs/chaostk/scripts/activate
 pip install chaostoolkit-spring
 ```
 
-## Intall Chaos Toolkit
+## Install Chaos Toolkit
 ```
 pip install chaostoolkit
 ```
