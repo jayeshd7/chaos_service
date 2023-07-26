@@ -1,0 +1,292 @@
+{
+  "chaoslib-version": "1.37.0",
+  "platform": "Windows-10-10.0.19044-SP0",
+  "node": "SLB-24YDVV3",
+  "experiment": {
+    "version": "1.0.0",
+    "title": "Employee when database is down",
+    "description": "N/A",
+    "tags": [],
+    "steady-state-hypothesis": {
+      "title": "Employee data is available",
+      "probes": [
+        {
+          "type": "probe",
+          "name": "we-can-retrieve-employee-data",
+          "tolerance": 200,
+          "provider": {
+            "type": "http",
+            "timeout": 5,
+            "url": "http://localhost:8080/employee/all"
+          }
+        }
+      ]
+    },
+    "method": [
+      {
+        "name": "enable_chaosmonkey",
+        "provider": {
+          "arguments": {
+            "base_url": "http://localhost:8080/actuator"
+          },
+          "func": "enable_chaosmonkey",
+          "module": "chaosspring.actions",
+          "type": "python"
+        },
+        "type": "action"
+      },
+      {
+        "name": "configure_assaults",
+        "provider": {
+          "arguments": {
+            "base_url": "http://localhost:8080/actuator",
+            "assaults_configuration": {
+              "level": 1,
+              "latencyActive": false,
+              "exceptionsActive": true,
+              "exception": {
+                "type": "java.net.ConnectException",
+                "arguments": [
+                  {
+                    "className": "java.lang.String",
+                    "value": "Connection timed out"
+                  }
+                ]
+              }
+            }
+          },
+          "func": "change_assaults_configuration",
+          "module": "chaosspring.actions",
+          "type": "python"
+        },
+        "type": "action"
+      },
+      {
+        "name": "configure_repository_watcher",
+        "tolerance": 200,
+        "provider": {
+          "type": "http",
+          "url": "http://localhost:8080/actuator/chaosmonkey/watchers",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "arguments": {
+            "controller": false,
+            "restController": false,
+            "service": false,
+            "repository": true,
+            "component": false
+          }
+        },
+        "type": "action"
+      }
+    ],
+    "rollbacks": [
+      {
+        "name": "disable_chaosmonkey",
+        "provider": {
+          "arguments": {
+            "base_url": "http://localhost:8080/actuator"
+          },
+          "func": "disable_chaosmonkey",
+          "module": "chaosspring.actions",
+          "type": "python"
+        },
+        "type": "action"
+      }
+    ],
+    "dry": null
+  },
+  "start": "2023-07-26T04:41:13.852849",
+  "status": "completed",
+  "deviated": true,
+  "steady_states": {
+    "before": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "we-can-retrieve-employee-data",
+            "tolerance": 200,
+            "provider": {
+              "type": "http",
+              "timeout": 5,
+              "url": "http://localhost:8080/employee/all"
+            }
+          },
+          "output": {
+            "status": 200,
+            "headers": {
+              "Content-Type": "application/json",
+              "Transfer-Encoding": "chunked",
+              "Date": "Wed, 26 Jul 2023 04:41:15 GMT",
+              "Keep-Alive": "timeout=60",
+              "Connection": "keep-alive"
+            },
+            "body": []
+          },
+          "start": "2023-07-26T04:41:13.857854",
+          "status": "succeeded",
+          "end": "2023-07-26T04:41:15.651256",
+          "duration": 1.793402,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "after": {
+      "steady_state_met": false,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "we-can-retrieve-employee-data",
+            "tolerance": 200,
+            "provider": {
+              "type": "http",
+              "timeout": 5,
+              "url": "http://localhost:8080/employee/all"
+            }
+          },
+          "output": {
+            "status": 500,
+            "headers": {
+              "Content-Type": "application/json",
+              "Transfer-Encoding": "chunked",
+              "Date": "Wed, 26 Jul 2023 04:41:15 GMT",
+              "Connection": "close"
+            },
+            "body": {
+              "timestamp": "2023-07-26T04:41:15.784+0000",
+              "status": 500,
+              "error": "Internal Server Error",
+              "message": "No message available",
+              "path": "/employee/all"
+            }
+          },
+          "start": "2023-07-26T04:41:15.757127",
+          "status": "succeeded",
+          "end": "2023-07-26T04:41:15.802126",
+          "duration": 0.044999,
+          "tolerance_met": false
+        }
+      ]
+    },
+    "during": []
+  },
+  "run": [
+    {
+      "activity": {
+        "name": "enable_chaosmonkey",
+        "provider": {
+          "arguments": {
+            "base_url": "http://localhost:8080/actuator"
+          },
+          "func": "enable_chaosmonkey",
+          "module": "chaosspring.actions",
+          "type": "python"
+        },
+        "type": "action"
+      },
+      "output": "Chaos Monkey is enabled",
+      "start": "2023-07-26T04:41:15.654176",
+      "status": "succeeded",
+      "end": "2023-07-26T04:41:15.660176",
+      "duration": 0.006
+    },
+    {
+      "activity": {
+        "name": "configure_assaults",
+        "provider": {
+          "arguments": {
+            "base_url": "http://localhost:8080/actuator",
+            "assaults_configuration": {
+              "level": 1,
+              "latencyActive": false,
+              "exceptionsActive": true,
+              "exception": {
+                "type": "java.net.ConnectException",
+                "arguments": [
+                  {
+                    "className": "java.lang.String",
+                    "value": "Connection timed out"
+                  }
+                ]
+              }
+            }
+          },
+          "func": "change_assaults_configuration",
+          "module": "chaosspring.actions",
+          "type": "python"
+        },
+        "type": "action"
+      },
+      "output": "Assault config has changed",
+      "start": "2023-07-26T04:41:15.661126",
+      "status": "succeeded",
+      "end": "2023-07-26T04:41:15.744126",
+      "duration": 0.083
+    },
+    {
+      "activity": {
+        "name": "configure_repository_watcher",
+        "tolerance": 200,
+        "provider": {
+          "type": "http",
+          "url": "http://localhost:8080/actuator/chaosmonkey/watchers",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "arguments": {
+            "controller": false,
+            "restController": false,
+            "service": false,
+            "repository": true,
+            "component": false
+          }
+        },
+        "type": "action"
+      },
+      "output": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "text/plain;charset=UTF-8",
+          "Content-Length": "26",
+          "Date": "Wed, 26 Jul 2023 04:41:15 GMT",
+          "Keep-Alive": "timeout=60",
+          "Connection": "keep-alive"
+        },
+        "body": "Watcher config has changed"
+      },
+      "start": "2023-07-26T04:41:15.744126",
+      "status": "succeeded",
+      "end": "2023-07-26T04:41:15.756125",
+      "duration": 0.011999
+    }
+  ],
+  "rollbacks": [
+    {
+      "activity": {
+        "name": "disable_chaosmonkey",
+        "provider": {
+          "arguments": {
+            "base_url": "http://localhost:8080/actuator"
+          },
+          "func": "disable_chaosmonkey",
+          "module": "chaosspring.actions",
+          "type": "python"
+        },
+        "type": "action"
+      },
+      "output": "Chaos Monkey is disabled",
+      "start": "2023-07-26T04:41:15.803126",
+      "status": "succeeded",
+      "end": "2023-07-26T04:41:15.807125",
+      "duration": 0.003999
+    }
+  ],
+  "end": "2023-07-26T04:41:15.807125",
+  "duration": 1.9542765617370605
+}
